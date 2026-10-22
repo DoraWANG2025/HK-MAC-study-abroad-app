@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>留学选校工具 · 动态版</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; padding: 24px 16px; }
+  .container { max-width: 1200px; margin: 0 auto; position: relative; }
+  
+  .update-badge { position: absolute; right: 0; top: 10px; background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+  
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 20px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 150px; }
+  .filter-group label { font-size: 0.72rem; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: 0.04em; }
+  select { padding: 8px 10px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 0.9rem; background: #fff; color: #1a1a2e; cursor: pointer; }
+  select:focus { outline: 2px solid #3b82f6; border-color: transparent; }
+  .stats { font-size: 0.82rem; color: #555; margin-bottom: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+  .card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 4px solid #3b82f6; display: flex; flex-direction: column; gap: 10px; }
+  .card.official { border-left-color: #22c55e; }
+  .card.aggregator { border-left-color: #f59e0b; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .card-title { font-size: 1rem; font-weight: 600; }
+  .card-region { font-size: 0.72rem; background: #eef2ff; color: #3b5bdb; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+  .card-level { font-size: 0.78rem; color: #666; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .tag { font-size: 0.7rem; padding: 1px 7px; border-radius: 3px; font-weight: 500; }
+  .tag-official { background: #dcfce7; color: #166534; }
+  .tag-aggregator { background: #fef3c7; color: #92400e; }
+  .tag-audience { background: #e0f2fe; color: #075985; }
+  .card-detail { font-size: 0.85rem; color: #333; }
+  .card-detail ul { margin: 6px 0 0 18px; font-size: 0.84rem; }
+  .card-detail li { margin-bottom: 3px; }
+  .card-tuition { font-size: 0.85rem; }
+  .card-tuition strong { color: #111; }
+  .card-time { font-size: 0.82rem; background: #faf5ff; padding: 8px 12px; border-radius: 6px; color: #6b21a8; }
+  .card-time strong { color: #4c1d95; }
+  .card-quota { font-size: 0.82rem; background: #f0f9ff; padding: 8px 12px; border-radius: 6px; color: #075985; }
+  .card-quota strong { color: #0c4a6e; }
+  .card-quota-note { font-size: 0.72rem; color: #6b7280; margin-top: 2px; display: block; }
+  .card-links { font-size: 0.78rem; display: flex; flex-wrap: wrap; gap: 16px; margin-top: 4px; }
+  .card-links a { color: #3b82f6; text-decoration: none; font-weight: 500; }
+  .card-links a:hover { text-decoration: underline; }
+  .card-note { font-size: 0.76rem; color: #777; border-top: 1px dashed #e5e7eb; padding-top: 8px; margin-top: 2px; }
+  .empty { text-align: center; padding: 48px 16px; color: #999; font-size: 0.95rem; }
+  @media (max-width: 600px) { .filters { flex-direction: column; } .update-badge { position: static; margin-bottom: 10px; display: inline-block; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="update-badge" id="update-time">🕒 数据加载中...</div>
+
+  <h1>🎓 动态留学选校工具 · 中国香港 / 中国澳门</h1>
+  <p class="subtitle">数据已接入本地数据库，筛选实时生效</p>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>学生身份</label>
+      <select id="filter-audience">
+        <option value="all">全部</option>
+        <option value="高考生">高考生</option>
+        <option value="国际生">国际生</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>留学层次</label>
+      <select id="filter-level">
+        <option value="all">全部</option>
+        <option value="大学本科">大学本科</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>地区</label>
+      <select id="filter-region">
+        <option value="all">全部</option>
+        <option value="中国香港">中国香港</option>
+        <option value="中国澳门">中国澳门</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>院校类型（香港）</label>
+      <select id="filter-type">
+        <option value="all">全部</option>
+        <option value="教资会资助">教资会资助</option>
+        <option value="自资">自资</option>
+        <option value="—">澳门（不分类）</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>学校</label>
+      <select id="filter-school"><option value="all">全部</option></select>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div class="cards" id="cards"></div>
+  <div class="empty" id="empty" style="display:none;">没有匹配的条目。</div>
+</div>
+
+<script>
+let DATA = [];
+
+async function fetchData() {
+  try {
+    const response = await fetch('http://localhost:3000/api/programs');
+    if (!response.ok) throw new Error('网络请求失败');
+    
+    const resData = await response.json();
+    DATA = resData.data;
+    
+    // 直接在前端生成今天的日期
+    const today = new Date();
+    const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    document.getElementById('update-time').innerText = `🕒 数据更新于：${dateStr}`;
+    
+    // 初始化下拉菜单
+    const schoolSelect = document.getElementById('filter-school');
+    const uniqueSchools = [...new Set(DATA.map(item => item.school))].sort();
+    uniqueSchools.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      schoolSelect.appendChild(opt);
+    });
+    
+    render();
+  } catch (error) {
+    document.getElementById('empty').style.display = 'block';
+    document.getElementById('empty').innerText = '❌ 获取数据失败，请检查后台 server.js 是否在运行。';
+  }
+}
+
+function render() {
+  const region = document.getElementById('filter-region').value;
+  const school = document.getElementById('filter-school').value;
+  const level = document.getElementById('filter-level').value;
+  const audience = document.getElementById('filter-audience').value;
+  const type = document.getElementById('filter-type').value;
+
+  const filtered = DATA.filter(item => {
+    if (region !== 'all' && item.region !== region) return false;
+    if (school !== 'all' && item.school !== school) return false;
+    if (level !== 'all' && item.level !== level) return false;
+    if (type !== 'all' && item.type !== type) return false;
+    if (audience !== 'all' && item.audience !== audience) return false;
+    return true;
+  });
+
+  document.getElementById('stats').textContent = `当前显示 ${filtered.length} 条结果`;
+
+  if (filtered.length === 0) {
+    document.getElementById('cards').innerHTML = '';
+    document.getElementById('empty').style.display = 'block';
+    return;
+  }
+  document.getElementById('empty').style.display = 'none';
+
+  document.getElementById('cards').innerHTML = filtered.map(item => {
+    const isOfficial = item.source === 'official';
+    const cardClass = isOfficial ? 'official' : 'aggregator';
+    const tagClass = isOfficial ? 'tag-official' : 'tag-aggregator';
+    const tagText = isOfficial ? '官网/官方渠道' : '平台参考';
+    
+    return `<div class="card ${cardClass}">
+      <div class="card-header"><span class="card-title">${escapeHtml(item.name)}</span><span class="card-region">${escapeHtml(item.region)}</span></div>
+      <div class="card-level">${escapeHtml(item.level)}${item.type && item.type !== '—' ? ' · ' + escapeHtml(item.type) : ''} <span class="tag ${tagClass}">${tagText}</span> <span class="tag tag-audience">${escapeHtml(item.audience)}</span></div>
+      <div class="card-detail"><strong>关键信息：</strong><ul>${item.details.map(d => `<li>${escapeHtml(d)}</li>`).join('')}</ul></div>
+      <div class="card-tuition"><strong>费用参考：</strong>${escapeHtml(item.tuition)}</div>
+      ${item.time ? `<div class="card-time"><strong>⏰ 申请时间：</strong>${escapeHtml(item.time)}</div>` : ''}
+      ${item.quota ? `<div class="card-quota"><strong>📋 志愿数量：</strong>${escapeHtml(item.quota)}<span class="card-quota-note">${escapeHtml(item.quotaNote || '')}</span></div>` : ''}
+      <div class="card-links">
+        ${item.linkApply ? `<a href="${escapeHtml(item.linkApply)}" target="_blank" rel="noopener">🔗 官方申请入口</a>` : ''}
+        ${item.linkProgrammes ? `<a href="${escapeHtml(item.linkProgrammes)}" target="_blank" rel="noopener">📚 查看可申请专业</a>` : ''}
+      </div>
+      ${item.note ? `<div class="card-note">📌 ${escapeHtml(item.note)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>"]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m] || m)); }
+
+['filter-region', 'filter-school', 'filter-level', 'filter-audience', 'filter-type'].forEach(id => {
+  document.getElementById(id).addEventListener('change', render);
+});
+
+fetchData();
+</script>
+</body>
+</html>
