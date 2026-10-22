@@ -4,10 +4,11 @@ const { Pool } = require('pg'); // 引入 PostgreSQL 驱动
 const cors = require('cors');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // 填入你的云端数据库连接串（请把 [YOUR-PASSWORD] 替换成你真实的密码！）
 // 注意：密码里如果包含 @ 或者 # 等特殊字符，需要转义（比如 @ 写成 %40）
