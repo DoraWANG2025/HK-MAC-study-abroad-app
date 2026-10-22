@@ -9,6 +9,7 @@
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; padding: 24px 16px; }
   .container { max-width: 1200px; margin: 0 auto; position: relative; }
   
+  /* 右上角更新时间标签 */
   .update-badge { position: absolute; right: 0; top: 10px; background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
   
   h1 { font-size: 1.5rem; margin-bottom: 4px; }
@@ -51,10 +52,11 @@
 </head>
 <body>
 <div class="container">
+  <!-- 右上角时间标签 -->
   <div class="update-badge" id="update-time">🕒 数据加载中...</div>
 
   <h1>🎓 动态留学选校工具 · 中国香港 / 中国澳门</h1>
-  <p class="subtitle">数据已接入本地数据库，筛选实时生效</p>
+  <p class="subtitle">数据已接入云端数据库，筛选实时生效</p>
 
   <div class="filters">
     <div class="filter-group">
@@ -103,20 +105,22 @@
 <script>
 let DATA = [];
 
+// 从云端获取数据
 async function fetchData() {
   try {
+    // 使用相对路径，既能在本地跑，也能在 Render 上跑
     const response = await fetch('/api/programs');
     if (!response.ok) throw new Error('网络请求失败');
     
     const resData = await response.json();
     DATA = resData.data;
     
-    // 直接在前端生成今天的日期
+    // 直接在前端生成今天的日期作为显示
     const today = new Date();
     const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
     document.getElementById('update-time').innerText = `🕒 数据更新于：${dateStr}`;
     
-    // 初始化下拉菜单
+    // 初始化下拉菜单（动态提取学校名字）
     const schoolSelect = document.getElementById('filter-school');
     const uniqueSchools = [...new Set(DATA.map(item => item.school))].sort();
     uniqueSchools.forEach(s => {
@@ -128,10 +132,12 @@ async function fetchData() {
     render();
   } catch (error) {
     document.getElementById('empty').style.display = 'block';
-    document.getElementById('empty').innerText = '❌ 获取数据失败，请检查后台 server.js 是否在运行。';
+    document.getElementById('empty').innerText = '❌ 获取数据失败，请检查网络或服务器状态。';
+    console.error(error);
   }
 }
 
+// 渲染页面和筛选逻辑
 function render() {
   const region = document.getElementById('filter-region').value;
   const school = document.getElementById('filter-school').value;
@@ -163,6 +169,7 @@ function render() {
     const tagClass = isOfficial ? 'tag-official' : 'tag-aggregator';
     const tagText = isOfficial ? '官网/官方渠道' : '平台参考';
     
+    // 因为后端把下划线命名转成了小驼峰，这里直接用
     return `<div class="card ${cardClass}">
       <div class="card-header"><span class="card-title">${escapeHtml(item.name)}</span><span class="card-region">${escapeHtml(item.region)}</span></div>
       <div class="card-level">${escapeHtml(item.level)}${item.type && item.type !== '—' ? ' · ' + escapeHtml(item.type) : ''} <span class="tag ${tagClass}">${tagText}</span> <span class="tag tag-audience">${escapeHtml(item.audience)}</span></div>
@@ -179,14 +186,18 @@ function render() {
   }).join('');
 }
 
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>"]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m] || m)); }
+// 转义函数防注入
+function escapeHtml(str) { 
+  if (!str) return ''; 
+  return str.replace(/[&<>"]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m] || m)); 
+}
 
+// 监听所有筛选器的变化
 ['filter-region', 'filter-school', 'filter-level', 'filter-audience', 'filter-type'].forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener('change', render);
-  el.addEventListener('input', render); // 兼容手机触屏
+  document.getElementById(id).addEventListener('change', render);
 });
 
+// 启动
 fetchData();
 </script>
 </body>

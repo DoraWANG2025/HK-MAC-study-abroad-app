@@ -5,17 +5,18 @@ const cors = require('cors');
 
 const app = express();
 
-// 👇 1. 这里是【改】：把原来的 3000 换成这句
+// 1. 适配 Render 的动态端口
 const port = process.env.PORT || 3000; 
 
 app.use(cors());
 app.use(express.json());
 
-// 👇 2. 这里是【加】：必须加这行，告诉服务器把 index.html 发给浏览器
+// 2. 让 Render 能够直接向浏览器发送前端文件（index.html）
 app.use(express.static(__dirname)); 
 
-// 3. 连接云端数据库（记得把“真实密码”四个字替换掉）
+// 3. 连接云端数据库
 const pool = new Pool({
+  // 这里的 || 后面是本地测试用的备用连接串。如果你在 Render 里配了 DATABASE_URL 环境变量，它就会优先用那个。
   connectionString: process.env.DATABASE_URL || "postgresql://postgres:Wang20050150117*@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres",
   ssl: { rejectUnauthorized: false }
 });
