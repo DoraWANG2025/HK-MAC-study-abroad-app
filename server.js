@@ -3,11 +3,11 @@ const { Pool } = require('pg');
 const cors = require('cors');
 
 const app = express();
-// 本地端口固定是 3000
-const port = 3000; 
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname)); 
 
 // 用最早的直连地址（本地电脑网络支持直连）
 const pool = new Pool({
