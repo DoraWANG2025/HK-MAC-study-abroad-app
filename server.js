@@ -17,7 +17,7 @@ app.use(express.static(__dirname));
 // 3. 连接云端数据库
 const pool = new Pool({
   // 这里的 || 后面是本地测试用的备用连接串。如果你在 Render 里配了 DATABASE_URL 环境变量，它就会优先用那个。
-  connectionString: process.env.DATABASE_URL || "postgresql://postgres:Wang20050150117*@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres",
+  connectionString: process.env.DATABASE_URL || "postgresql://postgres:Wang20050150117*@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres?sslmode=require&family=4",
   ssl: { rejectUnauthorized: false }
 });
 
