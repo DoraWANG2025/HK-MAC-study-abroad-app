@@ -1,23 +1,29 @@
+// server.js
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 3000;
+
+// 👇 1. 这里是【改】：把原来的 3000 换成这句
+const port = process.env.PORT || 3000; 
 
 app.use(cors());
 app.use(express.json());
+
+// 👇 2. 这里是【加】：必须加这行，告诉服务器把 index.html 发给浏览器
 app.use(express.static(__dirname)); 
 
-// 用最早的直连地址（本地电脑网络支持直连）
+// 3. 连接云端数据库（记得把“真实密码”四个字替换掉）
 const pool = new Pool({
-  connectionString: "postgresql://postgres.prkpulqchqfruehdpxrk:Wang20050150117@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres",
+  connectionString: process.env.DATABASE_URL || "postgresql://postgres:你的真实密码@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres",
   ssl: { rejectUnauthorized: false }
 });
 
 app.get('/api/programs', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM programs');
+    
     const formattedRows = result.rows.map(row => {
       let parsedDetails = [];
       try {
@@ -25,6 +31,7 @@ app.get('/api/programs', async (req, res) => {
       } catch (e) {
         parsedDetails = [row.details];
       }
+      
       return {
         ...row,
         quotaNote: row.quota_note,
@@ -33,6 +40,7 @@ app.get('/api/programs', async (req, res) => {
         details: parsedDetails
       };
     });
+
     res.json({ data: formattedRows });
   } catch (err) {
     console.error(err);
@@ -41,5 +49,5 @@ app.get('/api/programs', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 本地后端已启动: http://localhost:${port}`);
+  console.log(`🚀 后端已成功启动: 端口 ${port}`);
 });
