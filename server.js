@@ -16,7 +16,6 @@ const pool = new Pool({
   connectionString: "postgresql://postgres.prkpulqchqfruehdpxrk:Wang20050150117@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres",
   ssl: { rejectUnauthorized: false }
 });
-
 app.get('/api/programs', async (req, res) => {
   try {
     // 查询云端数据库
