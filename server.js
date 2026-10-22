@@ -13,8 +13,8 @@ app.use(express.static(__dirname));
 // 填入你的云端数据库连接串（请把 [YOUR-PASSWORD] 替换成你真实的密码！）
 // 注意：密码里如果包含 @ 或者 # 等特殊字符，需要转义（比如 @ 写成 %40）
 const pool = new Pool({
-  connectionString: "postgresql://postgres:Wang20050150117*@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres",
-  ssl: { rejectUnauthorized: false } // 云端数据库通常需要开启 SSL
+  connectionString: "postgresql://postgres.prkpulqchqfruehdpxrk:Wang20050150117@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres",
+  ssl: { rejectUnauthorized: false }
 });
 
 app.get('/api/programs', async (req, res) => {
