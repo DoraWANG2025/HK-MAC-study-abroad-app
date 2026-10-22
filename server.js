@@ -16,7 +16,7 @@ app.use(express.static(__dirname));
 
 // 3. 连接云端数据库（记得把“真实密码”四个字替换掉）
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://postgres:你的真实密码@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres",
+  connectionString: process.env.DATABASE_URL || "postgresql://postgres:Wang20050150117*@db.prkpulqchqfruehdpxrk.supabase.co:5432/postgres",
   ssl: { rejectUnauthorized: false }
 });
 
