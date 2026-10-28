@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // 从环境变量中读取云端数据库连接串
 const pool = new Pool({
