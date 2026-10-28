@@ -42,7 +42,7 @@
   .card-quota strong { color: #0c4a6e; }
   .card-quota-note { font-size: 0.72rem; color: #6b7280; margin-top: 2px; display: block; }
   
-  /* 新增案例样式 */
+  /* 案例模块样式 */
   .card-cases { font-size: 0.82rem; background: #fefce8; padding: 10px 12px; border-radius: 6px; color: #854d0e; border-left: 3px solid #eab308; }
   .card-cases ul { margin: 6px 0 0 16px; font-size: 0.8rem; }
   .card-cases li { margin-bottom: 4px; }
@@ -60,7 +60,7 @@
   <div class="update-badge" id="update-time">🕒 数据加载中...</div>
 
   <h1>🎓 动态留学选校工具 · 中国香港 / 中国澳门</h1>
-  <p class="subtitle">数据已接入本地数据库，筛选实时生效</p>
+  <p class="subtitle">数据已接入云端数据库，筛选实时生效</p>
 
   <div class="filters">
     <div class="filter-group">
@@ -167,9 +167,9 @@ function render() {
     const tagClass = isOfficial ? 'tag-official' : 'tag-aggregator';
     const tagText = isOfficial ? '官网/官方渠道' : '平台参考';
     
-    // 渲染案例模块（只有有案例时才显示）
+    // 安全渲染案例模块
     let casesHTML = '';
-    if (item.cases && item.cases.length > 0) {
+    if (item.cases && Array.isArray(item.cases) && item.cases.length > 0) {
       casesHTML = `
         <div class="card-cases">
           <strong>📂 近两年参考案例：</strong>
@@ -178,13 +178,18 @@ function render() {
       `;
     }
 
+    let detailsHTML = '';
+    if (item.details && Array.isArray(item.details)) {
+      detailsHTML = item.details.map(d => `<li>${escapeHtml(d)}</li>`).join('');
+    }
+
     return `<div class="card ${cardClass}">
       <div class="card-header"><span class="card-title">${escapeHtml(item.name)}</span><span class="card-region">${escapeHtml(item.region)}</span></div>
       <div class="card-level">${escapeHtml(item.level)}${item.type && item.type !== '—' ? ' · ' + escapeHtml(item.type) : ''} <span class="tag ${tagClass}">${tagText}</span> <span class="tag tag-audience">${escapeHtml(item.audience)}</span></div>
       
-      <div class="card-detail"><strong>关键信息：</strong><ul>${item.details.map(d => `<li>${escapeHtml(d)}</li>`).join('')}</ul></div>
+      <div class="card-detail"><strong>关键信息：</strong><ul>${detailsHTML}</ul></div>
       
-      ${casesHTML} <!-- 插入案例模块 -->
+      ${casesHTML}
       
       <div class="card-tuition"><strong>费用参考：</strong>${escapeHtml(item.tuition)}</div>
       ${item.time ? `<div class="card-time"><strong>⏰ 申请时间：</strong>${escapeHtml(item.time)}</div>` : ''}
@@ -199,7 +204,7 @@ function render() {
   }).join('');
 }
 
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>"]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m] || m)); }
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m] || m)); }
 
 ['filter-region', 'filter-school', 'filter-level', 'filter-audience', 'filter-type'].forEach(id => {
   document.getElementById(id).addEventListener('change', render);
