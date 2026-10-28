@@ -116,10 +116,16 @@ async function fetchData() {
     
     const resData = await response.json();
     DATA = resData.data;
-    
-    const today = new Date();
-    const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-    document.getElementById('update-time').innerText = `🕒 数据更新于：${dateStr}`;
+
+    // 展示服务器返回的真实数据更新时间（而非浏览器当天日期）
+    if (resData.lastUpdated) {
+      const d = new Date(resData.lastUpdated);
+      const pad = n => String(n).padStart(2, '0');
+      const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      document.getElementById('update-time').innerText = `🕒 数据更新于：${dateStr}`;
+    } else {
+      document.getElementById('update-time').innerText = '🕒 数据在线';
+    }
     
     const schoolSelect = document.getElementById('filter-school');
     const uniqueSchools = [...new Set(DATA.map(item => item.school))].sort();
