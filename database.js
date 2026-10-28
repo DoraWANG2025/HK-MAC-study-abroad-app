@@ -8,7 +8,7 @@ db.serialize(() => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     region TEXT, level TEXT, type TEXT, name TEXT, school TEXT, audience TEXT,
     details TEXT, tuition TEXT, time TEXT, quota TEXT, quotaNote TEXT,
-    linkApply TEXT, linkProgrammes TEXT, note TEXT, source TEXT, qsRank TEXT
+    linkApply TEXT, linkProgrammes TEXT, note TEXT, source TEXT, qsRank TEXT, qsSubject TEXT
   )`);
 
   // QS 世界大学排名 2027（2026-06-18 发布）
@@ -19,6 +19,23 @@ db.serialize(() => {
     "香港恒生大学": "未上榜", "东华学院": "未上榜", "香港珠海学院": "未上榜",
     "澳门大学": "#267", "澳门科技大学": "#398", "澳门理工大学": "951–1000",
     "澳门城市大学": "1001–1200", "圣若瑟大学": "未上榜", "澳门旅游大学": "未上榜", "澳门镜湖护理学院": "未上榜"
+  };
+
+  // QS 世界大学学科排名 2026（2026-03-25 发布，仅收录有学科上榜的学校）
+  const QS_SUBJECT = {
+    "香港大学": "牙医学 #2（亚洲第一）· 教育与培训 #5 · 地理学 #11 · 建筑与建造环境 #14 · 图书馆及信息管理 #15 · 数据科学与人工智能 #18（全港第一）· 法学 #20 · 土木与结构工程 #20（共 51 科上榜，29 科进全球前 50）",
+    "香港中文大学": "护理学 #6 · 传播与媒体研究 #16 · 语言学 #25 · 数据科学与人工智能 #28（21 个学科跻身全球前 50）",
+    "香港科技大学": "数据科学与人工智能 #25 · 土木与结构工程 #27 · 商业与管理学 #30 · 计算机科学与信息系统 #33（11 个学科进全球前 50）",
+    "香港理工大学": "酒店与休闲管理 #15 · 土木与结构工程 #18 · 护理学 #18 · 建筑与建造环境 #21 · 艺术与设计 #24（四个学科全港第一，24 科进全球百强）",
+    "香港城市大学": "语言学 #36 · 材料科学 #39 与兽医学均列全港第一 · 法律与法律研究 #41 · 传播与媒体研究 #49（5 个学科进全球前 50）",
+    "香港浸会大学": "古典文学与古代史 #38 · 传播与媒体研究 #48",
+    "香港教育大学": "教育学 #7（首次跻身全球前十）",
+    "岭南大学": "8 个学科上榜，哲学、传播与媒体研究等表现最佳（QS 指其为本年度进步最显著的院校之一）",
+    "香港都会大学": "首次上榜，共 6 个学科（酒店与休闲管理等，最佳名次 101–150）",
+    "澳门大学": "共 17 个学科上榜：语言学 #98 · 酒店与休闲管理 51–100 · 社会学 151–200 · 计算机科学与信息系统 251–300（大幅跃升 250 位）",
+    "澳门科技大学": "共 6 个学科上榜：酒店与休闲管理 101–150 · 计算机科学 401–450 · 电子电气工程 401–450（首次上榜）",
+    "澳门理工大学": "首次进入学科排名，共 2 个学科：语言学 301–350 · 计算机科学与信息系统 451–500",
+    "澳门旅游大学": "酒店与休闲管理全球 #10（亚洲第一、澳门第一）"
   };
 
   const allData = [
@@ -68,10 +85,10 @@ db.serialize(() => {
   ];
 
   db.run("DELETE FROM programs");
-  const stmt = db.prepare(`INSERT INTO programs (region, level, type, name, school, audience, details, tuition, time, quota, quotaNote, linkApply, linkProgrammes, note, source, qsRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const stmt = db.prepare(`INSERT INTO programs (region, level, type, name, school, audience, details, tuition, time, quota, quotaNote, linkApply, linkProgrammes, note, source, qsRank, qsSubject) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 
   allData.forEach(data => {
-    stmt.run(data.region, data.level, data.type, data.name, data.school, data.audience, data.details, data.tuition, data.time, data.quota, data.quotaNote, data.linkApply, data.linkProgrammes, data.note, data.source, QS_RANK[data.school] || '未上榜');
+    stmt.run(data.region, data.level, data.type, data.name, data.school, data.audience, data.details, data.tuition, data.time, data.quota, data.quotaNote, data.linkApply, data.linkProgrammes, data.note, data.source, QS_RANK[data.school] || '未上榜', QS_SUBJECT[data.school] || null);
   });
   
   stmt.finalize();

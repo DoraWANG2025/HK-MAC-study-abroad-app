@@ -32,6 +32,7 @@
   .tag-aggregator { background: #fef3c7; color: #92400e; }
   .tag-audience { background: #e0f2fe; color: #075985; }
   .tag-qs { background: #fef9c3; color: #854d0e; font-weight: 600; }
+  .card-subject { margin-top: 8px; font-size: 13px; line-height: 1.6; color: #475569; background: #f8fafc; border-left: 3px solid #fbbf24; padding: 6px 10px; border-radius: 4px; }
   .card-detail { font-size: 0.85rem; color: #333; }
   .card-detail ul { margin: 6px 0 0 18px; font-size: 0.84rem; }
   .card-detail li { margin-bottom: 3px; }
@@ -193,6 +194,7 @@ function render() {
     return `<div class="card ${cardClass}">
       <div class="card-header"><span class="card-title">${escapeHtml(item.name)}</span><span class="card-region">${escapeHtml(item.region)}</span></div>
       <div class="card-level">${escapeHtml(item.level)}${item.type && item.type !== '—' ? ' · ' + escapeHtml(item.type) : ''} <span class="tag ${tagClass}">${tagText}</span> <span class="tag tag-audience">${escapeHtml(item.audience)}</span>${item.qs_rank ? `<span class="tag tag-qs">QS 2027 ${escapeHtml(item.qs_rank)}</span>` : ''}</div>
+      ${item.qs_subject ? `<div class="card-subject">🏅 <strong>QS 2026 学科亮点：</strong>${escapeHtml(item.qs_subject)}</div>` : ''}
       
       <div class="card-detail"><strong>关键信息：</strong><ul>${detailsHTML}</ul></div>
       
