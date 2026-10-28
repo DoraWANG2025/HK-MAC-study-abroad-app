@@ -3,12 +3,23 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./schools.db');
 
 db.serialize(() => {
+  db.run("DROP TABLE IF EXISTS programs");
   db.run(`CREATE TABLE IF NOT EXISTS programs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     region TEXT, level TEXT, type TEXT, name TEXT, school TEXT, audience TEXT,
     details TEXT, tuition TEXT, time TEXT, quota TEXT, quotaNote TEXT,
-    linkApply TEXT, linkProgrammes TEXT, note TEXT, source TEXT
+    linkApply TEXT, linkProgrammes TEXT, note TEXT, source TEXT, qsRank TEXT
   )`);
+
+  // QS 世界大学排名 2027（2026-06-18 发布）
+  const QS_RANK = {
+    "香港大学": "#11", "香港中文大学": "#18", "香港科技大学": "#33", "香港理工大学": "#50",
+    "香港城市大学": "#52", "香港浸会大学": "#216", "香港教育大学": "#406", "岭南大学": "#581",
+    "香港都会大学": "781–790", "香港树仁大学": "1001–1200",
+    "香港恒生大学": "未上榜", "东华学院": "未上榜", "香港珠海学院": "未上榜",
+    "澳门大学": "#267", "澳门科技大学": "#398", "澳门理工大学": "951–1000",
+    "澳门城市大学": "1001–1200", "圣若瑟大学": "未上榜", "澳门旅游大学": "未上榜", "澳门镜湖护理学院": "未上榜"
+  };
 
   const allData = [
     // --- 香港 · 国际生 ---
@@ -57,10 +68,10 @@ db.serialize(() => {
   ];
 
   db.run("DELETE FROM programs");
-  const stmt = db.prepare(`INSERT INTO programs (region, level, type, name, school, audience, details, tuition, time, quota, quotaNote, linkApply, linkProgrammes, note, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-          
+  const stmt = db.prepare(`INSERT INTO programs (region, level, type, name, school, audience, details, tuition, time, quota, quotaNote, linkApply, linkProgrammes, note, source, qsRank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+
   allData.forEach(data => {
-    stmt.run(data.region, data.level, data.type, data.name, data.school, data.audience, data.details, data.tuition, data.time, data.quota, data.quotaNote, data.linkApply, data.linkProgrammes, data.note, data.source);
+    stmt.run(data.region, data.level, data.type, data.name, data.school, data.audience, data.details, data.tuition, data.time, data.quota, data.quotaNote, data.linkApply, data.linkProgrammes, data.note, data.source, QS_RANK[data.school] || '未上榜');
   });
   
   stmt.finalize();

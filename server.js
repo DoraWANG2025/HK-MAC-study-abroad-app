@@ -29,7 +29,7 @@ let dataCache = { hash: null, lastUpdated: null };
 // 生成数据内容哈希（只取业务字段，忽略 id 等无关字段，保证内容不变则哈希不变）
 function computeHash(rows) {
   const keyFields = ['region', 'level', 'type', 'name', 'school', 'audience', 'details', 'tuition',
-    'time', 'quota', 'quota_note', 'link_apply', 'link_programmes', 'note', 'source', 'cases'];
+    'time', 'quota', 'quota_note', 'link_apply', 'link_programmes', 'note', 'source', 'cases', 'qs_rank'];
   const normalized = rows.map(row => {
     const obj = {};
     keyFields.forEach(f => { obj[f] = row[f] ?? null; });
